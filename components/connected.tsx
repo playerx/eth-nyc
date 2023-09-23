@@ -104,7 +104,6 @@ const ConnectedInner = ({ username }: { username: string }) => {
           "/assets/packs/common/mouth/" +
             (Math.floor(Math.random() * 15) + 1) +
             ".png",
-          "", // "/assets/packs/common/facialHair/1.png",
           "/assets/packs/common/eyes/" +
             (Math.floor(Math.random() * 14) + 1) +
             ".png",
@@ -134,7 +133,7 @@ const ConnectedInner = ({ username }: { username: string }) => {
     if (isNounsMode) {
       x[2] = url;
     } else {
-      x[5] = url;
+      x[4] = url;
     }
 
     setItems(x);
@@ -206,9 +205,7 @@ const ConnectedInner = ({ username }: { username: string }) => {
         ) : true ? (
           <>
             <div className={styles.avatar}>
-              {activeItems.map((x, i) => (
-                <img key={i} src={x} />
-              ))}
+              {activeItems.map((x, i) => (x ? <img key={i} src={x} /> : <></>))}
             </div>
             {/* <ThirdwebNftMedia metadata={ownedNFTs[0].metadata} /> */}
             <p>Your Avatar</p>
