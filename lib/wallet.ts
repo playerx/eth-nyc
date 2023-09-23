@@ -48,6 +48,9 @@ export async function registerAccount(
 ) {
   try {
     const accountName = window.prompt("Please enter a new account name", "");
+    if (!accountName) {
+      return;
+    }
 
     const generatedRegistrationOptions = await generateRegistrationOptions({
       rpName: "demo",

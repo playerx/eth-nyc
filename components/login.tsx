@@ -2,26 +2,21 @@
 import { Signer } from "ethers";
 import { useState } from "react";
 import { Blocks } from "react-loader-spinner";
-import { loginAccount, registerAccount, verifyChallenge } from "../lib/wallet";
+import { loginAccount, registerAccount } from "../lib/wallet";
 import styles from "../styles/Home.module.css";
 import { Connected } from "./connected";
-import { Footer } from "./footer";
 
 export const Login = () => {
-  const [username, setUsername] = useState(
-    "0xE5F48897E47530af72a818e03381A8C7d13e1Db9"
-  );
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("Guest");
   const [signer, setSigner] = useState<Signer | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState("");
   const [error, setError] = useState("");
 
   const registerWallet = async () => {
-    // if (!username || !password) return;
     try {
       setIsLoading(true);
-      const wallet = await registerAccount("123", (status) =>
+      const wallet = await registerAccount("super-hard-challenge", (status) =>
         setLoadingStatus(status)
       );
       if (!wallet) {
@@ -34,7 +29,8 @@ export const Login = () => {
     } catch (e) {
       setIsLoading(false);
       console.error(e);
-      setError((e as any).message);
+      setError("");
+      // setError((e as any).message);
     }
   };
 
@@ -49,7 +45,8 @@ export const Login = () => {
     } catch (e) {
       setIsLoading(false);
       console.error(e);
-      setError((e as any).message);
+      setError("");
+      // setError((e as any).message);
     }
   };
 
@@ -83,30 +80,17 @@ export const Login = () => {
   ) : (
     <>
       <div className={styles.row_center} style={{ marginTop: "2rem" }}>
-        <a href="https://thirdweb.com">
-          <img src="thirdweb.svg" className={styles.logo} alt="logo" />
-        </a>
-        <h1 className={styles.title}>Unilogin</h1>
+        <h1 className={styles.title}>Your Web3 Identity</h1>
       </div>
       <div className={styles.filler}>
         <button className={styles.button} onClick={() => registerWallet()}>
-          Register
+          Register New Account
         </button>
 
         <button className={styles.button} onClick={() => connectWallet()}>
-          Biometric (Device) Login
-        </button>
-
-        <button
-          className={styles.button}
-          onClick={() => {
-            verifyChallenge("123").then((x) => console.log(x));
-          }}
-        >
-          Check
+          Login
         </button>
       </div>
-      <Footer />
     </>
   );
 };

@@ -1,4 +1,5 @@
 import {
+  NFT,
   SmartContract,
   ThirdwebNftMedia,
   ThirdwebSDKProvider,
@@ -34,6 +35,12 @@ export const Connected = ({
   );
 };
 
+const defaultItems: NFT[] = [
+  { supply: "1", type: "ERC721", owner: "", metadata: { id: "", uri: "" } },
+  { supply: "1", type: "ERC721", owner: "", metadata: { id: "", uri: "" } },
+  { supply: "1", type: "ERC721", owner: "", metadata: { id: "", uri: "" } },
+];
+
 const ConnectedInner = ({ username }: { username: string }) => {
   const address = useAddress();
   const { contract } = useContract(DEV_CAT_CONTRACT);
@@ -49,8 +56,7 @@ const ConnectedInner = ({ username }: { username: string }) => {
   return (
     <>
       <h1 className={styles.title} style={{ marginTop: "2rem" }}>
-        Welcome <br />
-        <span className={styles.gradientText1}>{username}</span>
+        Welcome <span className={styles.gradientText1}>{username}</span>
       </h1>
       <hr className={styles.divider} />
       <p className={styles.label}>
@@ -83,6 +89,9 @@ const ConnectedInner = ({ username }: { username: string }) => {
           </>
         ) : ownedNFTs && ownedNFTs.length > 0 ? (
           <>
+            <ul>
+              <li></li>
+            </ul>
             <ThirdwebNftMedia metadata={ownedNFTs[0].metadata} />
             <p>You own {ownedNFTs[0].quantityOwned}</p>
             <p className={styles.description} style={{ fontWeight: "bold" }}>
@@ -189,7 +198,7 @@ const TotalClaimed = ({
   const { data: totalClaimed } = useTotalCirculatingSupply(contract, 0);
   return (
     <div className={styles.column_center} style={{ marginBottom: "2rem" }}>
-      <p style={{ color: "#999" }}>
+      {/* <p style={{ color: "#999" }}>
         <b>{totalClaimed?.toString() || "-"}</b> DevCats have been claimed
       </p>
       <p className={styles.label} style={{ color: "#999", marginTop: "5px" }}>
@@ -200,7 +209,7 @@ const TotalClaimed = ({
         >
           {shortenIfAddress(DEV_CAT_CONTRACT)}
         </a>
-      </p>
+      </p> */}
     </div>
   );
 };
