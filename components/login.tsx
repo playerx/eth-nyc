@@ -3,7 +3,7 @@ import { Signer } from "ethers";
 import { useState } from "react";
 import { Blocks } from "react-loader-spinner";
 import { loginAccount, registerAccount } from "../lib/wallet";
-import styles from "../styles/Home.module.css";
+import styles from "../styles/Home.module.scss";
 import { Connected } from "./connected";
 
 export const Login = () => {

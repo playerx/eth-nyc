@@ -1,7 +1,6 @@
 import {
   NFT,
   SmartContract,
-  ThirdwebNftMedia,
   ThirdwebSDKProvider,
   useAddress,
   useClaimNFT,
@@ -11,11 +10,12 @@ import {
   useTransferNFT,
 } from "@thirdweb-dev/react";
 import { Signer } from "ethers";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Blocks } from "react-loader-spinner";
 import { shortenIfAddress } from "../lib/addresses";
+import { commonAvatarLayers } from "../lib/commonItems";
 import { DEV_CAT_CONTRACT, THIRDWEB_API_KEY, chain } from "../lib/constants";
-import styles from "../styles/Home.module.css";
+import styles from "../styles/Home.module.scss";
 
 export const Connected = ({
   username,
@@ -35,11 +35,88 @@ export const Connected = ({
   );
 };
 
-const defaultItems: NFT[] = [
-  { supply: "1", type: "ERC721", owner: "", metadata: { id: "", uri: "" } },
-  { supply: "1", type: "ERC721", owner: "", metadata: { id: "", uri: "" } },
-  { supply: "1", type: "ERC721", owner: "", metadata: { id: "", uri: "" } },
-];
+const defaultItems = [
+  ...commonAvatarLayers.accessories.map((x) => ({
+    supply: "1",
+    type: "ERC721",
+    owner: "",
+    metadata: {
+      id: x[0].toString(),
+      uri: x[1],
+      attributes: { type: "accessories" },
+    },
+  })),
+  ...commonAvatarLayers.clothes.map((x) => ({
+    supply: "1",
+    type: "ERC721",
+    owner: "",
+    metadata: {
+      id: x[0].toString(),
+      uri: x[1],
+      attributes: { type: "clothes" },
+    },
+  })),
+  ...commonAvatarLayers.eyebrows.map((x) => ({
+    supply: "1",
+    type: "ERC721",
+    owner: "",
+    metadata: {
+      id: x[0].toString(),
+      uri: x[1],
+      attributes: { type: "eyebrows" },
+    },
+  })),
+  ...commonAvatarLayers.eyes.map((x) => ({
+    supply: "1",
+    type: "ERC721",
+    owner: "",
+    metadata: {
+      id: x[0].toString(),
+      uri: x[1],
+      attributes: { type: "eyes" },
+    },
+  })),
+  ...commonAvatarLayers.facialHair.map((x) => ({
+    supply: "1",
+    type: "ERC721",
+    owner: "",
+    metadata: {
+      id: x[0].toString(),
+      uri: x[1],
+      attributes: { type: "facialHair" },
+    },
+  })),
+  ...commonAvatarLayers.hair.map((x) => ({
+    supply: "1",
+    type: "ERC721",
+    owner: "",
+    metadata: {
+      id: x[0].toString(),
+      uri: x[1],
+      attributes: { type: "hair" },
+    },
+  })),
+  ...commonAvatarLayers.mouth.map((x) => ({
+    supply: "1",
+    type: "ERC721",
+    owner: "",
+    metadata: {
+      id: x[0].toString(),
+      uri: x[1],
+      attributes: { type: "mouth" },
+    },
+  })),
+  ...commonAvatarLayers.skin.map((x) => ({
+    supply: "1",
+    type: "ERC721",
+    owner: "",
+    metadata: {
+      id: x[0].toString(),
+      uri: x[1],
+      attributes: { type: "skin" },
+    },
+  })),
+] as NFT[];
 
 const ConnectedInner = ({ username }: { username: string }) => {
   const address = useAddress();
@@ -53,6 +130,70 @@ const ConnectedInner = ({ username }: { username: string }) => {
     refetch,
   } = useOwnedNFTs(contract, address);
   const [transferTo, setTransferTo] = useState("");
+  const [activeItems, setActiveItems] = useState<string[]>([]);
+  const [selectedCloth, setSelectedCloth] = useState(
+    "/assets/packs/common/clothes/22.png"
+  );
+
+  const availableClothes = [
+    "/assets/packs/common/clothes/2.png",
+    "/assets/packs/common/clothes/4.png",
+    "/assets/packs/common/clothes/7.png",
+    "/assets/packs/common/clothes/24.png",
+    "/assets/packs/common/clothes/29.png",
+  ];
+
+  const [claimedClothes, setClaimedClothes] = useState([]);
+
+  useEffect(() => {
+    const lastSaved = localStorage.getItem(address!);
+    if (!lastSaved) {
+      randomAvatar();
+    } else {
+      setItems(JSON.parse(lastSaved));
+    }
+  }, [address]);
+
+  function randomAvatar() {
+    const x = [
+      "/assets/packs/common/skin/" +
+        (Math.floor(Math.random() * 24) + 1) +
+        ".png",
+      "/assets/packs/common/mouth/" +
+        (Math.floor(Math.random() * 15) + 1) +
+        ".png",
+      "", // "/assets/packs/common/facialHair/1.png",
+      "/assets/packs/common/eyes/" +
+        (Math.floor(Math.random() * 14) + 1) +
+        ".png",
+      "/assets/packs/common/eyebrows/" +
+        (Math.floor(Math.random() * 14) + 1) +
+        ".png",
+      selectedCloth,
+      "", // "/assets/packs/common/accessories/1.png",
+      "/assets/packs/common/hair/" +
+        (Math.floor(Math.random() * 19) + 1) +
+        ".png",
+    ];
+
+    setItems(x);
+  }
+
+  function setItems(items: string[]) {
+    localStorage.setItem(address!, JSON.stringify(items));
+
+    setActiveItems(items);
+  }
+
+  function updateCloth(url: string) {
+    setSelectedCloth(url);
+
+    const x = [...activeItems];
+    x[5] = url;
+
+    setItems(x);
+  }
+
   return (
     <>
       <h1 className={styles.title} style={{ marginTop: "2rem" }}>
@@ -89,15 +230,46 @@ const ConnectedInner = ({ username }: { username: string }) => {
           </>
         ) : ownedNFTs && ownedNFTs.length > 0 ? (
           <>
-            <ul>
-              <li></li>
-            </ul>
-            <ThirdwebNftMedia metadata={ownedNFTs[0].metadata} />
-            <p>You own {ownedNFTs[0].quantityOwned}</p>
+            <div className={styles.avatar}>
+              {activeItems.map((x) => (
+                <img src={x} />
+              ))}
+            </div>
+            {/* <ThirdwebNftMedia metadata={ownedNFTs[0].metadata} /> */}
+            <p>Your Avatar</p>
             <p className={styles.description} style={{ fontWeight: "bold" }}>
-              ethCC DevCat
+              Web3 Identity
             </p>
-            <p style={{ color: "#999" }}>
+            <button
+              className={styles.button}
+              style={{
+                marginTop: 0,
+                width: "130px",
+                borderRadius: "0 5px 5px 0",
+              }}
+              onClick={() => randomAvatar()}
+            >
+              Randomize
+            </button>
+
+            <hr className={styles.divider} />
+
+            <div>
+              <h2>Clothes</h2>
+              <div className={styles.clothes}>
+                {availableClothes.map((x) => (
+                  <div
+                    onClick={() => {
+                      updateCloth(x);
+                    }}
+                  >
+                    <img src="/assets/packs/common/skin/1.png" />
+                    <img src={x} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* <p style={{ color: "#999" }}>
               view on{" "}
               <a
                 href={`https://testnets.opensea.io/assets/base-goerli/${DEV_CAT_CONTRACT.toLowerCase()}/${
@@ -107,13 +279,13 @@ const ConnectedInner = ({ username }: { username: string }) => {
               >
                 OpenSea
               </a>
-            </p>
+            </p> */}
 
             <hr className={styles.divider} />
             <div className={styles.row_center} style={{ width: "100%" }}>
               <input
                 type="text"
-                placeholder="Wallet address / ENS"
+                placeholder="Transfer to wallet address / ENS"
                 className={styles.input}
                 style={{ borderRadius: "5px 0 0 5px" }}
                 value={transferTo}

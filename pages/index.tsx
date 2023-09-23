@@ -1,7 +1,6 @@
-import styles from "../styles/Home.module.css";
 import { NextPage } from "next";
-import React from "react";
 import { Login } from "../components/login";
+import styles from "../styles/Home.module.scss";
 
 const Home: NextPage = () => {
   return (
