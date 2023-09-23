@@ -12,7 +12,11 @@ import {
   Transaction,
   isContractDeployed,
 } from "@thirdweb-dev/react";
-import { LocalWallet, SmartWallet } from "@thirdweb-dev/wallets";
+import {
+  LocalWallet,
+  MetaMaskWallet,
+  SmartWallet,
+} from "@thirdweb-dev/wallets";
 import {
   ACCOUNT_ABI,
   THIRDWEB_API_KEY,
@@ -93,12 +97,44 @@ export async function registerAccount(
   }
 }
 
+export async function metamaskLoginAccount(
+  sdk: import("@metamask/sdk").MetaMaskSDK,
+  statusCallback?: (status: string) => void
+) {
+  try {
+    const accounts: any = await sdk?.connect();
+    const accountId = accounts?.[0];
+    if (!accountId) {
+      return;
+    }
+
+    return await ensureSmartWalletExistsMM(
+      accountId,
+      accountId,
+      accountId,
+      statusCallback
+    );
+  } catch (err) {
+    console.warn(`failed to connect..`, err);
+  }
+}
+
 export async function loginAccount(statusCallback?: (status: string) => void) {
   const { signature, rawId } = await verifyChallenge("hello");
   const pwd = signature!;
   console.log("PWD login challenge result", pwd);
 
   return await ensureSmartWalletExists(rawId, rawId, pwd, statusCallback);
+}
+
+export async function mmLoginAccount(
+  statusCallback?: (status: string) => void
+) {
+  try {
+    return await ensureSmartWalletExistsMM("", "", "", statusCallback);
+  } catch (err) {
+    console.warn(`failed to connect..`, err);
+  }
 }
 
 export async function ensureSmartWalletExists(
@@ -205,6 +241,23 @@ export async function ensureSmartWalletExists(
   }
 
   return smartWallet;
+}
+
+export async function ensureSmartWalletExistsMM(
+  username: string,
+  displayName: string,
+  pwd: string,
+  statusCallback?: (status: string) => void
+): Promise<MetaMaskWallet> {
+  statusCallback?.("Checking username...");
+  const sdk = new ThirdwebSDK(chain, {
+    clientId: THIRDWEB_API_KEY || "",
+  });
+
+  const personalWallet = new MetaMaskWallet({});
+  username = await personalWallet.connect();
+
+  return personalWallet;
 }
 
 export async function verifyChallenge(challenge: string) {

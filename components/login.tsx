@@ -1,8 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
+import { useSDK } from "@metamask/sdk-react";
 import { Signer } from "ethers";
 import { useState } from "react";
 import { Blocks } from "react-loader-spinner";
-import { loginAccount, registerAccount } from "../lib/wallet";
+import { loginAccount, mmLoginAccount, registerAccount } from "../lib/wallet";
 import styles from "../styles/Home.module.scss";
 import { Connected } from "./connected";
 
@@ -12,6 +13,7 @@ export const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState("");
   const [error, setError] = useState("");
+  const { sdk, connected, connecting, provider, chainId } = useSDK();
 
   const registerWallet = async () => {
     try {
@@ -29,7 +31,6 @@ export const Login = () => {
     } catch (e) {
       setIsLoading(false);
       console.error(e);
-      // setError("");
       setError((e as any).message);
     }
   };
@@ -46,6 +47,24 @@ export const Login = () => {
       setIsLoading(false);
       console.error(e);
       // setError("");
+      setError((e as any).message);
+    }
+  };
+
+  const connectMetamaskWallet = async () => {
+    try {
+      setIsLoading(true);
+      const wallet = await mmLoginAccount((status) => setLoadingStatus(status));
+      if (!wallet) {
+        throw new Error("Canceled");
+      }
+
+      const s = await wallet!.getSigner();
+      setSigner(s);
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
+      console.error(e);
       setError((e as any).message);
     }
   };
@@ -89,6 +108,13 @@ export const Login = () => {
 
         <button className={styles.button} onClick={() => connectWallet()}>
           Login
+        </button>
+
+        <button
+          className={styles.button}
+          onClick={() => connectMetamaskWallet()}
+        >
+          Metamask Login
         </button>
       </div>
     </>

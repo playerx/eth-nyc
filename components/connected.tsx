@@ -72,7 +72,7 @@ const ConnectedInner = ({ username }: { username: string }) => {
   function randomAvatar() {
     const x = [
       "/assets/packs/common/skin/" +
-        (Math.floor(Math.random() * 24) + 1) +
+        (Math.floor(Math.random() * 16) + 1) +
         ".png",
       "/assets/packs/common/mouth/" +
         (Math.floor(Math.random() * 15) + 1) +
