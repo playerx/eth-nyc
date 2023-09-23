@@ -99,7 +99,7 @@ export const Login = () => {
   ) : (
     <>
       <div className={styles.row_center} style={{ marginTop: "2rem" }}>
-        <h1 className={styles.title}>Your Visual Identity for Web3</h1>
+        <h1 className={styles.title}>Build Your Visual Identity</h1>
       </div>
       <div className={styles.filler}>
         <button className={styles.button} onClick={() => registerWallet()}>
