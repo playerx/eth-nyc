@@ -297,3 +297,19 @@
     min-height: 140px;
   }
 }
+
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .button {
+    width: unset;
+    font-size: 16px;
+    height: unset;
+    padding: 4px 10px;
+    margin-left: 4px;
+  }
+  .button:not(.active) {
+    filter: grayscale(1);
+  }
+}

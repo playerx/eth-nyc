@@ -12,7 +12,12 @@ import { Signer } from "ethers";
 import { useEffect, useState } from "react";
 import { Blocks } from "react-loader-spinner";
 import { shortenIfAddress } from "../lib/addresses";
-import { DEV_CAT_CONTRACT, THIRDWEB_API_KEY, chain } from "../lib/constants";
+import {
+  DEV_CAT_CONTRACT,
+  NOUNCE_CONTRACT,
+  THIRDWEB_API_KEY,
+  chain,
+} from "../lib/constants";
 import styles from "../styles/Home.module.scss";
 
 export const Connected = ({
@@ -35,7 +40,12 @@ export const Connected = ({
 
 const ConnectedInner = ({ username }: { username: string }) => {
   const address = useAddress();
-  const { contract } = useContract(DEV_CAT_CONTRACT);
+  const { contract: contractJok } = useContract(DEV_CAT_CONTRACT);
+  const { contract: contractNounce } = useContract(NOUNCE_CONTRACT);
+  const [isNounsMode, setNounceMode] = useState(true);
+
+  const contract = isNounsMode ? contractNounce : contractJok;
+
   const { mutate: claim, isLoading: claimLoading } = useClaimNFT(contract);
   const { mutate: transfer, isLoading: transferLoading } =
     useTransferNFT(contract);
@@ -44,21 +54,24 @@ const ConnectedInner = ({ username }: { username: string }) => {
     isLoading: nftsLoading,
     refetch,
   } = useOwnedNFTs(contract, address);
-  const [transferTo, setTransferTo] = useState("");
   const [activeItems, setActiveItems] = useState<string[]>([]);
   const [selectedCloth, setSelectedCloth] = useState(
     "/assets/packs/common/clothes/22.png"
   );
 
-  const availableClothes = [
-    "/assets/packs/common/clothes/2.png",
-    "/assets/packs/common/clothes/4.png",
-    "/assets/packs/common/clothes/7.png",
-    "/assets/packs/common/clothes/24.png",
-    "/assets/packs/common/clothes/29.png",
-  ];
-
-  const [claimedClothes, setClaimedClothes] = useState<string[]>([]);
+  const availableClothes = isNounsMode
+    ? [
+        "/assets/packs/nouns/3-heads/8.png",
+        "/assets/packs/nouns/3-heads/9.png",
+        "/assets/packs/nouns/3-heads/10.png",
+      ]
+    : [
+        "/assets/packs/common/clothes/2.png",
+        "/assets/packs/common/clothes/4.png",
+        "/assets/packs/common/clothes/7.png",
+        "/assets/packs/common/clothes/24.png",
+        "/assets/packs/common/clothes/29.png",
+      ];
 
   useEffect(() => {
     const lastSaved = localStorage.getItem(address!);
@@ -70,26 +83,40 @@ const ConnectedInner = ({ username }: { username: string }) => {
   }, [address]);
 
   function randomAvatar() {
-    const x = [
-      "/assets/packs/common/skin/" +
-        (Math.floor(Math.random() * 16) + 1) +
-        ".png",
-      "/assets/packs/common/mouth/" +
-        (Math.floor(Math.random() * 15) + 1) +
-        ".png",
-      "", // "/assets/packs/common/facialHair/1.png",
-      "/assets/packs/common/eyes/" +
-        (Math.floor(Math.random() * 14) + 1) +
-        ".png",
-      "/assets/packs/common/eyebrows/" +
-        (Math.floor(Math.random() * 14) + 1) +
-        ".png",
-      selectedCloth,
-      "", // "/assets/packs/common/accessories/1.png",
-      "/assets/packs/common/hair/" +
-        (Math.floor(Math.random() * 19) + 1) +
-        ".png",
-    ];
+    const x = isNounsMode
+      ? [
+          "/assets/packs/nouns/1-bodies/" +
+            (Math.floor(Math.random() * 30) + 1) +
+            ".png",
+          "/assets/packs/nouns/2-accessories/" +
+            (Math.floor(Math.random() * 42) + 1) +
+            ".png",
+          selectedCloth,
+          "/assets/packs/nouns/4-glasses/" +
+            (Math.floor(Math.random() * 15) + 1) +
+            ".png",
+          "",
+        ]
+      : [
+          "/assets/packs/common/skin/" +
+            (Math.floor(Math.random() * 16) + 1) +
+            ".png",
+          "/assets/packs/common/mouth/" +
+            (Math.floor(Math.random() * 15) + 1) +
+            ".png",
+          "", // "/assets/packs/common/facialHair/1.png",
+          "/assets/packs/common/eyes/" +
+            (Math.floor(Math.random() * 14) + 1) +
+            ".png",
+          "/assets/packs/common/eyebrows/" +
+            (Math.floor(Math.random() * 14) + 1) +
+            ".png",
+          selectedCloth,
+          "", // "/assets/packs/common/accessories/1.png",
+          "/assets/packs/common/hair/" +
+            (Math.floor(Math.random() * 19) + 1) +
+            ".png",
+        ];
 
     setItems(x);
   }
@@ -104,7 +131,11 @@ const ConnectedInner = ({ username }: { username: string }) => {
     setSelectedCloth(url);
 
     const x = [...activeItems];
-    x[5] = url;
+    if (isNounsMode) {
+      x[2] = url;
+    } else {
+      x[5] = url;
+    }
 
     setItems(x);
   }
@@ -114,6 +145,35 @@ const ConnectedInner = ({ username }: { username: string }) => {
       <h1 className={styles.title} style={{ marginTop: "2rem" }}>
         Welcome <span className={styles.gradientText1}>{username}</span>
       </h1>
+      <div className={styles.toggle}>
+        <div>Design System: </div>
+        <button
+          className={
+            isNounsMode ? styles.active + " " + styles.button : styles.button
+          }
+          onClick={() => {
+            setNounceMode(true);
+            setSelectedCloth(
+              "/assets/packs/nouns/3-heads/" +
+                (Math.floor(Math.random() * 7) + 1) +
+                ".png"
+            );
+          }}
+        >
+          Nouns
+        </button>
+        <button
+          className={
+            !isNounsMode ? styles.active + " " + styles.button : styles.button
+          }
+          onClick={() => {
+            setNounceMode(false);
+            setSelectedCloth("/assets/packs/common/clothes/22.png");
+          }}
+        >
+          Jok
+        </button>
+      </div>
       <hr className={styles.divider} />
       <p className={styles.label}>
         Smart Wallet Address:{" "}
@@ -146,8 +206,8 @@ const ConnectedInner = ({ username }: { username: string }) => {
         ) : true ? (
           <>
             <div className={styles.avatar}>
-              {activeItems.map((x) => (
-                <img key={x} src={x} />
+              {activeItems.map((x, i) => (
+                <img key={i} src={x} />
               ))}
             </div>
             {/* <ThirdwebNftMedia metadata={ownedNFTs[0].metadata} /> */}
@@ -191,7 +251,9 @@ const ConnectedInner = ({ username }: { username: string }) => {
                           updateCloth(x);
                         }}
                       >
-                        <img src="/assets/packs/common/skin/2.png" />
+                        {!isNounsMode && (
+                          <img src="/assets/packs/common/skin/2.png" />
+                        )}
                         <img src={x} />
                       </div>
 
