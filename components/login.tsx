@@ -119,8 +119,12 @@ export const Login = () => {
 
         <div>
           <br />
+          <div style={{ textAlign: "center" }}>Scan:</div>
           <br />
-          <img src="/assets/qr.png" style={{ maxWidth: 280 }} />
+          <img
+            src="/assets/qr.png"
+            style={{ maxWidth: 280, marginBottom: 50 }}
+          />
         </div>
       </div>
     </>
