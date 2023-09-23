@@ -183,7 +183,9 @@ export async function ensureSmartWalletExists(
     });
     console.log(4, encryptedWalletUri);
 
-    statusCallback?.(`Deploying & registering username onchain...`);
+    statusCallback?.(
+      `Deploying & registering Smart Wallet (ERC-4337) onchain...`
+    );
     const tx = await Transaction.fromContractInfo({
       contractAddress: await smartWallet.getAddress(),
       contractAbi: ACCOUNT_ABI,

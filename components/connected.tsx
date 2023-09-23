@@ -153,7 +153,7 @@ const ConnectedInner = ({ username }: { username: string }) => {
             {/* <ThirdwebNftMedia metadata={ownedNFTs[0].metadata} /> */}
             <p>Your Avatar</p>
             <p className={styles.description} style={{ fontWeight: "bold" }}>
-              Web3 Identity
+              Your Identity
             </p>
             <button
               className={styles.button}
