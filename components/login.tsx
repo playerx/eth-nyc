@@ -116,6 +116,12 @@ export const Login = () => {
         >
           Metamask Login
         </button>
+
+        <div>
+          <br />
+          <br />
+          <img src="/assets/qr.png" style={{ maxWidth: 280 }} />
+        </div>
       </div>
     </>
   );
