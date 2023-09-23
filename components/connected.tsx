@@ -1,5 +1,4 @@
 import {
-  NFT,
   SmartContract,
   ThirdwebSDKProvider,
   useAddress,
@@ -13,7 +12,6 @@ import { Signer } from "ethers";
 import { useEffect, useState } from "react";
 import { Blocks } from "react-loader-spinner";
 import { shortenIfAddress } from "../lib/addresses";
-import { commonAvatarLayers } from "../lib/commonItems";
 import { DEV_CAT_CONTRACT, THIRDWEB_API_KEY, chain } from "../lib/constants";
 import styles from "../styles/Home.module.scss";
 
@@ -34,89 +32,6 @@ export const Connected = ({
     </ThirdwebSDKProvider>
   );
 };
-
-const defaultItems = [
-  ...commonAvatarLayers.accessories.map((x) => ({
-    supply: "1",
-    type: "ERC721",
-    owner: "",
-    metadata: {
-      id: x[0].toString(),
-      uri: x[1],
-      attributes: { type: "accessories" },
-    },
-  })),
-  ...commonAvatarLayers.clothes.map((x) => ({
-    supply: "1",
-    type: "ERC721",
-    owner: "",
-    metadata: {
-      id: x[0].toString(),
-      uri: x[1],
-      attributes: { type: "clothes" },
-    },
-  })),
-  ...commonAvatarLayers.eyebrows.map((x) => ({
-    supply: "1",
-    type: "ERC721",
-    owner: "",
-    metadata: {
-      id: x[0].toString(),
-      uri: x[1],
-      attributes: { type: "eyebrows" },
-    },
-  })),
-  ...commonAvatarLayers.eyes.map((x) => ({
-    supply: "1",
-    type: "ERC721",
-    owner: "",
-    metadata: {
-      id: x[0].toString(),
-      uri: x[1],
-      attributes: { type: "eyes" },
-    },
-  })),
-  ...commonAvatarLayers.facialHair.map((x) => ({
-    supply: "1",
-    type: "ERC721",
-    owner: "",
-    metadata: {
-      id: x[0].toString(),
-      uri: x[1],
-      attributes: { type: "facialHair" },
-    },
-  })),
-  ...commonAvatarLayers.hair.map((x) => ({
-    supply: "1",
-    type: "ERC721",
-    owner: "",
-    metadata: {
-      id: x[0].toString(),
-      uri: x[1],
-      attributes: { type: "hair" },
-    },
-  })),
-  ...commonAvatarLayers.mouth.map((x) => ({
-    supply: "1",
-    type: "ERC721",
-    owner: "",
-    metadata: {
-      id: x[0].toString(),
-      uri: x[1],
-      attributes: { type: "mouth" },
-    },
-  })),
-  ...commonAvatarLayers.skin.map((x) => ({
-    supply: "1",
-    type: "ERC721",
-    owner: "",
-    metadata: {
-      id: x[0].toString(),
-      uri: x[1],
-      attributes: { type: "skin" },
-    },
-  })),
-] as NFT[];
 
 const ConnectedInner = ({ username }: { username: string }) => {
   const address = useAddress();
@@ -143,7 +58,7 @@ const ConnectedInner = ({ username }: { username: string }) => {
     "/assets/packs/common/clothes/29.png",
   ];
 
-  const [claimedClothes, setClaimedClothes] = useState([]);
+  const [claimedClothes, setClaimedClothes] = useState<string[]>([]);
 
   useEffect(() => {
     const lastSaved = localStorage.getItem(address!);
@@ -228,11 +143,11 @@ const ConnectedInner = ({ username }: { username: string }) => {
                 : "Transfering..."}
             </p>
           </>
-        ) : ownedNFTs && ownedNFTs.length > 0 ? (
+        ) : true ? (
           <>
             <div className={styles.avatar}>
               {activeItems.map((x) => (
-                <img src={x} />
+                <img key={x} src={x} />
               ))}
             </div>
             {/* <ThirdwebNftMedia metadata={ownedNFTs[0].metadata} /> */}
@@ -257,16 +172,112 @@ const ConnectedInner = ({ username }: { username: string }) => {
             <div>
               <h2>Clothes</h2>
               <div className={styles.clothes}>
-                {availableClothes.map((x) => (
-                  <div
-                    onClick={() => {
-                      updateCloth(x);
-                    }}
-                  >
-                    <img src="/assets/packs/common/skin/1.png" />
-                    <img src={x} />
-                  </div>
-                ))}
+                {availableClothes.map((x, i) => {
+                  const isOwned = ownedNFTs
+                    ?.map((x) => x.metadata.id)
+                    .includes(i.toString());
+
+                  return (
+                    <div key={i} className={styles.clothesContainer}>
+                      <div
+                        className={
+                          isOwned ? styles.available : styles.notAvailable
+                        }
+                        onClick={() => {
+                          if (!isOwned) {
+                            return;
+                          }
+
+                          updateCloth(x);
+                        }}
+                      >
+                        <img src="/assets/packs/common/skin/2.png" />
+                        <img src={x} />
+                      </div>
+
+                      {isOwned && (
+                        <button
+                          className={styles.button}
+                          onClick={() => {
+                            const walletAddress = prompt(
+                              "To Wallet Address / ENS"
+                            );
+                            if (!walletAddress) {
+                              return;
+                            }
+
+                            transfer(
+                              {
+                                to: walletAddress,
+                                tokenId: i,
+                                amount: 1,
+                              },
+                              {
+                                onSuccess: async () => {
+                                  // wait for 1 sec before refetching
+                                  await new Promise((resolve) =>
+                                    setTimeout(resolve, 1000)
+                                  );
+                                  await refetch();
+                                },
+                                onError: (err) =>
+                                  alert((err as any).reason || err),
+                              }
+                            );
+                          }}
+                        >
+                          Transfer
+                        </button>
+                      )}
+
+                      {!isOwned && (
+                        <button
+                          className={styles.button}
+                          onClick={() =>
+                            claim(
+                              {
+                                quantity: 1,
+                                tokenId: i,
+                              },
+                              {
+                                onSuccess: async () => {
+                                  alert("Claim successful");
+                                  // wait for 1 sec before refetching
+                                  await new Promise((resolve) =>
+                                    setTimeout(resolve, 1000)
+                                  );
+                                  await refetch();
+                                },
+                                onError: (err) => {
+                                  let reason = (err as any).reason || err;
+                                  if (reason == "!Qty") {
+                                    reason =
+                                      "Already claimed max number of DevCats!";
+                                  }
+                                  alert(reason);
+                                },
+                              }
+                            )
+                          }
+                        >
+                          Claim
+                        </button>
+
+                        // <button
+                        //   className={styles.button}
+                        //   style={{
+                        //     marginTop: 0,
+                        //     width: "100px",
+                        //     borderRadius: "0 5px 5px 0",
+                        //   }}
+                        //   onClick={() => {}}
+                        // >
+                        //   Claim
+                        // </button>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
             {/* <p style={{ color: "#999" }}>
@@ -283,15 +294,15 @@ const ConnectedInner = ({ username }: { username: string }) => {
 
             <hr className={styles.divider} />
             <div className={styles.row_center} style={{ width: "100%" }}>
-              <input
+              {/* <input
                 type="text"
                 placeholder="Transfer to wallet address / ENS"
                 className={styles.input}
                 style={{ borderRadius: "5px 0 0 5px" }}
                 value={transferTo}
                 onChange={(e) => setTransferTo(e.target.value)}
-              />
-              <button
+              /> */}
+              {/* <button
                 className={styles.button}
                 style={{
                   marginTop: 0,
@@ -320,7 +331,7 @@ const ConnectedInner = ({ username }: { username: string }) => {
                 }
               >
                 Transfer
-              </button>
+              </button> */}
             </div>
           </>
         ) : (
@@ -368,20 +379,39 @@ const TotalClaimed = ({
   contract: SmartContract | undefined;
 }) => {
   const { data: totalClaimed } = useTotalCirculatingSupply(contract, 0);
+  const { data: totalClaimed2 } = useTotalCirculatingSupply(contract, 1);
+  const { data: totalClaimed3 } = useTotalCirculatingSupply(contract, 2);
+  const { data: totalClaimed4 } = useTotalCirculatingSupply(contract, 3);
+  const { data: totalClaimed5 } = useTotalCirculatingSupply(contract, 4);
+
+  console.log(
+    totalClaimed,
+    totalClaimed2,
+    totalClaimed3,
+    totalClaimed4,
+    totalClaimed5
+  );
+  const total =
+    (totalClaimed?.toNumber() ?? 0) +
+    (totalClaimed2?.toNumber() ?? 0) +
+    (totalClaimed3?.toNumber() ?? 0) +
+    (totalClaimed4?.toNumber() ?? 0) +
+    (totalClaimed5?.toNumber() ?? 0);
+
   return (
     <div className={styles.column_center} style={{ marginBottom: "2rem" }}>
-      {/* <p style={{ color: "#999" }}>
-        <b>{totalClaimed?.toString() || "-"}</b> DevCats have been claimed
+      <p style={{ color: "#999" }}>
+        <b>{total?.toString() || "-"}</b> T-Shirts have been claimed
       </p>
       <p className={styles.label} style={{ color: "#999", marginTop: "5px" }}>
         Contract:{" "}
         <a
-          href={`https://thirdweb.com/${chain.slug}/${DEV_CAT_CONTRACT}`}
+          href={`https://goerli.etherscan.io/address/${DEV_CAT_CONTRACT}`}
           target="_blank"
         >
           {shortenIfAddress(DEV_CAT_CONTRACT)}
         </a>
-      </p> */}
+      </p>
     </div>
   );
 };

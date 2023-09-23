@@ -29,8 +29,8 @@ export const Login = () => {
     } catch (e) {
       setIsLoading(false);
       console.error(e);
-      setError("");
-      // setError((e as any).message);
+      // setError("");
+      setError((e as any).message);
     }
   };
 
@@ -45,8 +45,8 @@ export const Login = () => {
     } catch (e) {
       setIsLoading(false);
       console.error(e);
-      setError("");
-      // setError((e as any).message);
+      // setError("");
+      setError((e as any).message);
     }
   };
 
@@ -80,7 +80,7 @@ export const Login = () => {
   ) : (
     <>
       <div className={styles.row_center} style={{ marginTop: "2rem" }}>
-        <h1 className={styles.title}>Your Web3 Identity</h1>
+        <h1 className={styles.title}>Your Visual Identity for Web3</h1>
       </div>
       <div className={styles.filler}>
         <button className={styles.button} onClick={() => registerWallet()}>

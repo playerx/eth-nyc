@@ -128,6 +128,7 @@
   line-height: 1.15;
   font-size: 4rem;
   margin: 0.5rem 0;
+  text-align: center !important;
 }
 
 .logo {
@@ -143,7 +144,7 @@
 
 .divider {
   width: 100%;
-  border: 1px solid #222;
+  border: 1px solid #3b3b3b;
   margin: 1rem 0;
 }
 
@@ -243,10 +244,14 @@
   filter: invert(1);
 }
 
+.avatar {
+  margin-top: 10px;
+}
+
 .avatar,
 .clothes {
   position: relative;
-  min-height: 200px;
+  min-height: 150px;
   margin-left: -100px;
 
   img {
@@ -259,6 +264,15 @@
   }
 }
 
+.clothesContainer {
+  display: flex;
+  flex-direction: column;
+
+  button {
+    z-index: 100;
+    width: 100px;
+  }
+}
 .clothes {
   margin-left: auto;
   margin-right: auto;
@@ -271,5 +285,15 @@
     position: relative;
     width: 130px;
     height: 200px;
+    margin-bottom: 30px;
+  }
+
+  .notAvailable {
+    filter: blur(10px);
+  }
+
+  .available,
+  .notAvailable {
+    min-height: 140px;
   }
 }

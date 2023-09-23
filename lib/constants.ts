@@ -7,7 +7,7 @@ export const chain = Goerli;
 const chainInfos = {
   [Goerli.chainId]: {
     factoryAddress: "0xeC06A32F2a421544BA552373d254071492aD7629", // 0xF8631a71b51129453fb70057aAcA80d4c2f0929F
-    openEditionContract: "0xf91E0ffA115F8390aE1DE0801A847924Df8ad282",
+    openEditionContract: "0xf369A5ca2e08350F74fB183F32b5FdB69C8B26B7",
   },
   [BaseGoerli.chainId]: {
     factoryAddress: "0x2637758c0777d58E3278A6022730e997A83d04bF",
