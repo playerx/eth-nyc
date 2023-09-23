@@ -56,7 +56,9 @@ const ConnectedInner = ({ username }: { username: string }) => {
   } = useOwnedNFTs(contract, address);
   const [activeItems, setActiveItems] = useState<string[]>([]);
   const [selectedCloth, setSelectedCloth] = useState(
-    "/assets/packs/common/clothes/22.png"
+    isNounsMode
+      ? "/assets/packs/nouns/3-heads/1.png"
+      : "/assets/packs/common/clothes/22.png"
   );
 
   const availableClothes = isNounsMode
