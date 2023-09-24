@@ -16,6 +16,7 @@ import {
   LocalWallet,
   MetaMaskWallet,
   SmartWallet,
+  WalletConnect,
 } from "@thirdweb-dev/wallets";
 import {
   ACCOUNT_ABI,
@@ -137,6 +138,14 @@ export async function mmLoginAccount(
   }
 }
 
+export async function walletConnect(statusCallback?: (status: string) => void) {
+  try {
+    return await ensureWalletConnect("", "", "", statusCallback);
+  } catch (err) {
+    console.warn(`failed to connect..`, err);
+  }
+}
+
 export async function ensureSmartWalletExists(
   username: string,
   displayName: string,
@@ -249,12 +258,27 @@ export async function ensureSmartWalletExistsMM(
   pwd: string,
   statusCallback?: (status: string) => void
 ): Promise<MetaMaskWallet> {
+  statusCallback?.("Checking walletconnect...");
+  const personalWallet = new MetaMaskWallet({});
+  username = await personalWallet.connect();
+
+  return personalWallet;
+}
+
+export async function ensureWalletConnect(
+  username: string,
+  displayName: string,
+  pwd: string,
+  statusCallback?: (status: string) => void
+): Promise<WalletConnect> {
   statusCallback?.("Checking username...");
   const sdk = new ThirdwebSDK(chain, {
     clientId: THIRDWEB_API_KEY || "",
   });
 
-  const personalWallet = new MetaMaskWallet({});
+  const personalWallet = new WalletConnect({
+    projectId: "f4fa01c026b2e37734bfe55651238d3e",
+  });
   username = await personalWallet.connect();
 
   return personalWallet;

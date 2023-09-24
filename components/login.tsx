@@ -3,7 +3,12 @@ import { useSDK } from "@metamask/sdk-react";
 import { Signer } from "ethers";
 import { useState } from "react";
 import { Blocks } from "react-loader-spinner";
-import { loginAccount, mmLoginAccount, registerAccount } from "../lib/wallet";
+import {
+  loginAccount,
+  mmLoginAccount,
+  registerAccount,
+  walletConnect,
+} from "../lib/wallet";
 import styles from "../styles/Home.module.scss";
 import { Connected } from "./connected";
 
@@ -69,6 +74,24 @@ export const Login = () => {
     }
   };
 
+  const connectWalletConnect = async () => {
+    try {
+      setIsLoading(true);
+      const wallet = await walletConnect((status) => setLoadingStatus(status));
+      if (!wallet) {
+        throw new Error("Canceled");
+      }
+
+      const s = await wallet!.getSigner();
+      setSigner(s);
+      setIsLoading(false);
+    } catch (e) {
+      setIsLoading(false);
+      console.error(e);
+      setError((e as any).message);
+    }
+  };
+
   return username && signer ? (
     <>
       <Connected signer={signer} username={username} />
@@ -115,6 +138,13 @@ export const Login = () => {
           onClick={() => connectMetamaskWallet()}
         >
           Metamask Login
+        </button>
+
+        <button
+          className={styles.button}
+          onClick={() => connectWalletConnect()}
+        >
+          Wallet Connect
         </button>
 
         <div>
